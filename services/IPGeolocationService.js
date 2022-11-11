@@ -44,27 +44,34 @@ const saveHistoryTraces = (newTraceData) => {
  * Getting statistics
  */
 const getStatistics = () => {   
-    let mostTracedFound;
-    let longestDistranceFound;
-    requestTraces.forEach(requestTrace => {
-        if(!mostTracedFound || (mostTracedFound.tracesCount < requestTrace.tracesCount)){
-            mostTracedFound = requestTrace;
+    let result = {
+        mostTracedFound: '',
+        longestDistranceFound: ''
+    };
+    if(requestTraces.length > 0){
+        let mostTracedFound;
+        let longestDistranceFound;
+        requestTraces.forEach(requestTrace => {
+            if(!mostTracedFound || (mostTracedFound.tracesCount < requestTrace.tracesCount)){
+                mostTracedFound = requestTrace;
+            }
+            if(!longestDistranceFound || (longestDistranceFound.distanceFromUSA < requestTrace.distanceFromUSA)){
+                longestDistranceFound = requestTrace;
+            }
+        });
+    
+        result =  {
+            longest_distance: {
+                country: longestDistranceFound.country,
+                value: longestDistranceFound.distanceFromUSA
+            },
+            most_traced: {
+                country: mostTracedFound.country,
+                value: mostTracedFound.tracesCount
+            },
         }
-        if(!longestDistranceFound || (longestDistranceFound.distanceFromUSA < requestTrace.distanceFromUSA)){
-            longestDistranceFound = requestTrace;
-        }
-    });
-
-    return {
-        longest_distance: {
-            country: longestDistranceFound.country,
-            value: longestDistranceFound.distanceFromUSA
-        },
-        most_traced: {
-            country: mostTracedFound.country,
-            value: mostTracedFound.tracesCount
-        },
     }
+    return result;
 }
 
 const convertCurrency = async (fromCurrency, toCurrency = "USD", amount = 1) => {

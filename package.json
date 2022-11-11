@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "Leonel Matias Vazquez",
   "license": "ISC",
@@ -21,6 +21,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
+    "jest": "^29.3.1",
     "express-swagger-generator-example-array": "^1.1.19"
   }
 }
