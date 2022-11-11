@@ -1,0 +1,57 @@
+{
+	"info": {
+		"_postman_id": "72897324-b22d-45e9-90b0-30d7821a9c8c",
+		"name": "Challenge CU",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1030233"
+	},
+	"item": [
+		{
+			"name": "POST - TRACES",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ip\": \"181.165.228.153\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/api/traces",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"traces"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET - STATISTICS",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/api/statistics",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"statistics"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
