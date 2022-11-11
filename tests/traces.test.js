@@ -15,7 +15,7 @@ describe('Test a 200', () => {
         .then(res => {
             expect(res.status).toBe(200);
         }).catch(err => {
-            expect(err.response.status).toBeGreaterThanOrEqual(400);        
+            expect(err?.response?.status).toBeGreaterThanOrEqual(400);        
         })
     });
 });
@@ -26,7 +26,7 @@ describe('Test a 400 sending bad parameter type', () => {
         .then(res => {
             expect(res.status).toBeGreaterThanOrEqual(400);
         }).catch(err => {
-            expect(err.response.status).toBeGreaterThanOrEqual(400);
+            expect(err?.response?.status).toBeGreaterThanOrEqual(400);
         })
     });
 });

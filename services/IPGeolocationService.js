@@ -1,8 +1,7 @@
 const axios = require("axios");
 const { utils } = require('../commons');
 const { getDistanceFromLatLonInKm } = require("../commons/utils");
-
-const requestTraces = [];
+const { requestTraces } = require('../cache');
 
 /**
  * Getting trace by ip
