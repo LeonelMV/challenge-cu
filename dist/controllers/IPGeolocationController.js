@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_validator_1 = require("express-validator");
+const cache_1 = require("../cache");
 const services_1 = require("../services");
 const commons_1 = require("../commons");
 const ipTraces = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -21,6 +22,7 @@ const ipTraces = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         const { ip } = req.body;
         const result = yield services_1.IPGeolocationService.ipTraces(ip);
+        cache_1.appCache.set(ip, result === null || result === void 0 ? void 0 : result.data);
         res.status(result === null || result === void 0 ? void 0 : result.status).send(result === null || result === void 0 ? void 0 : result.data);
     }
     catch (error) {

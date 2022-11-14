@@ -5,7 +5,9 @@ const api = express.Router();
 
 import { IPGeolocationController } from "../controllers";
 
-import { ipTracesSchema } from"../controllers/schemas";
+import { ipTracesSchema } from "../controllers/schemas";
+
+import { cacheTraces } from "../middlewares";
 
 /** BEGIN ROUTES **/
 
@@ -19,7 +21,7 @@ import { ipTracesSchema } from"../controllers/schemas";
  * @returns {object} 200 - object with trace data
  * @returns {Error}  default - Unexpected error
  */
-api.post("/traces", ipTracesSchema, IPGeolocationController.ipTraces);
+api.post("/traces", ipTracesSchema, cacheTraces, IPGeolocationController.ipTraces);
 
 /**
  * This function comment is parsed by doctrine

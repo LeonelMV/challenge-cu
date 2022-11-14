@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
+import { appCache } from "../cache";
 
 import { IPGeolocationService } from '../services';
 import { logger } from '../commons';
@@ -14,6 +15,7 @@ const ipTraces = async (req: Request, res: Response) => {
         }
         const { ip } = req.body;
         const result = await IPGeolocationService.ipTraces(ip);
+        appCache.set(ip, result?.data);
         res.status(result?.status).send(result?.data)
     }catch(error) {
         logger.error(error);

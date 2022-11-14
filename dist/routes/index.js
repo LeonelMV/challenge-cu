@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const api = express_1.default.Router();
 const controllers_1 = require("../controllers");
 const schemas_1 = require("../controllers/schemas");
+const middlewares_1 = require("../middlewares");
 /** BEGIN ROUTES **/
 /**
  * This function comment is parsed by doctrine
@@ -18,7 +19,7 @@ const schemas_1 = require("../controllers/schemas");
  * @returns {object} 200 - object with trace data
  * @returns {Error}  default - Unexpected error
  */
-api.post("/traces", schemas_1.ipTracesSchema, controllers_1.IPGeolocationController.ipTraces);
+api.post("/traces", schemas_1.ipTracesSchema, middlewares_1.cacheTraces, controllers_1.IPGeolocationController.ipTraces);
 /**
  * This function comment is parsed by doctrine
  * @route GET /statistics
