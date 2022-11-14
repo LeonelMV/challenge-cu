@@ -1,14 +1,13 @@
-const axios = require("axios");
-const { utils } = require('../commons');
-const { getDistanceFromLatLonInKm } = require("../commons/utils");
-const { requestTraces } = require('../cache');
+import axios from "axios";
+import { utils } from '../commons';
+import { requestTraces } from '../cache';
 
 /**
  * Getting trace by ip
  * @param {ip} req 
  * @param {*} res 
  */
-const ipTraces = async (ip) => {
+const ipTraces = async (ip: string) => {
     let result;
     try{
         const response = await axios.post(`${process.env.IP_API_BASE_URL}/json/${ip}?fields=country,countryCode,lat,lon,currency,query`);
@@ -23,14 +22,14 @@ const ipTraces = async (ip) => {
     return result;
 }
 
-const saveHistoryTraces = (newTraceData) => {
-    const usaLatLon = JSON.parse(process.env.USA_LAT_LONG);
-    let traceToSave = requestTraces.find(trace => trace.country === newTraceData.country);
+const saveHistoryTraces = (newTraceData: any) => {
+    const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
+    let traceToSave = requestTraces.find((trace: any) => trace.country === newTraceData.country);
     if(!traceToSave){
         requestTraces.push({  
             country: newTraceData.country, 
             tracesCount: 1, 
-            distanceFromUSA: getDistanceFromLatLonInKm(newTraceData.lat, newTraceData.lon, usaLatLon.lat, usaLatLon.lon) });
+            distanceFromUSA: utils.getDistanceFromLatLonInKm(newTraceData.lat, newTraceData.lon, newYorkLatLon.lat, newYorkLatLon.lon) });
     }else{
         traceToSave = {
             country: traceToSave.country,
@@ -43,14 +42,14 @@ const saveHistoryTraces = (newTraceData) => {
  * Getting statistics
  */
 const getStatistics = () => {   
-    let result = {
+    let result: any = {
         mostTracedFound: '',
         longestDistranceFound: ''
     };
     if(requestTraces.length > 0){
-        let mostTracedFound;
-        let longestDistranceFound;
-        requestTraces.forEach(requestTrace => {
+        let mostTracedFound : any;
+        let longestDistranceFound : any;
+        requestTraces.forEach((requestTrace: any) => {
             if(!mostTracedFound || (mostTracedFound.tracesCount < requestTrace.tracesCount)){
                 mostTracedFound = requestTrace;
             }
@@ -73,7 +72,7 @@ const getStatistics = () => {
     return result;
 }
 
-const convertCurrency = async (fromCurrency, toCurrency = "USD", amount = 1) => {
+const convertCurrency = async (fromCurrency: any, toCurrency = "USD", amount = 1) => {
     let result;
     try{
         const headers = {
@@ -88,11 +87,11 @@ const convertCurrency = async (fromCurrency, toCurrency = "USD", amount = 1) => 
 }
 
 /* Mapping the final response */
-const ipTracesResponseMapping = async (ipData) => {
+const ipTracesResponseMapping = async (ipData: any) => {
     let response = {};
     if(ipData){
         const { country: name, countryCode: code, lat, lon, query: ip, currency } = ipData;
-        const usaLatLon = JSON.parse(process.env.USA_LAT_LONG);
+        const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
         response = {
             ip,
             name, 
@@ -100,15 +99,15 @@ const ipTracesResponseMapping = async (ipData) => {
             lat, 
             lon,
             currencies: await convertCurrency(currency),
-            distance_to_usa: parseFloat(utils.getDistanceFromLatLonInKm(lat, lon, usaLatLon.lat, usaLatLon.lon).toFixed(2)),
+            distance_to_usa: parseFloat(utils.getDistanceFromLatLonInKm(lat, lon, newYorkLatLon.lat, newYorkLatLon.lon).toFixed(2)),
         }
     }
     return response;
 }
 
 /* Mapping the final response */
-const currencyResponseMapping = (currencyData) => {
-    let currencies = [];
+const currencyResponseMapping = (currencyData: any) => {
+    let currencies: Array<any> = [];
     if(currencyData){
         currencies = [
             { 
@@ -126,7 +125,7 @@ const currencyResponseMapping = (currencyData) => {
     return currencies;
 }
 
-module.exports = {
+export default {
     ipTraces,
     getStatistics,
 }

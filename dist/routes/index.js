@@ -1,14 +1,13 @@
-'use strict'
-
-const express = require('express');
-const api = express.Router();
-
-const { IPGeolocationController } = require("../controllers");
-
-const { ipTracesSchema } = require("../controllers/schemas");
-
+'use strict';
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const api = express_1.default.Router();
+const controllers_1 = require("../controllers");
+const schemas_1 = require("../controllers/schemas");
 /** BEGIN ROUTES **/
-
 /**
  * This function comment is parsed by doctrine
  * @route POST /traces
@@ -19,8 +18,7 @@ const { ipTracesSchema } = require("../controllers/schemas");
  * @returns {object} 200 - object with trace data
  * @returns {Error}  default - Unexpected error
  */
-api.post("/traces", ipTracesSchema, IPGeolocationController.ipTraces);
-
+api.post("/traces", schemas_1.ipTracesSchema, controllers_1.IPGeolocationController.ipTraces);
 /**
  * This function comment is parsed by doctrine
  * @route GET /statistics
@@ -30,8 +28,6 @@ api.post("/traces", ipTracesSchema, IPGeolocationController.ipTraces);
  * @returns {object} 200 - object with trace data
  * @returns {Error}  default - Unexpected error
  */
-api.get("/statistics", IPGeolocationController.getStatistics);
-
+api.get("/statistics", controllers_1.IPGeolocationController.getStatistics);
 /** END ROUTES **/
-
-module.exports = api;
+exports.default = api;

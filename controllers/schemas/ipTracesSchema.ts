@@ -1,7 +1,7 @@
-const { check } = require('express-validator');
-const { utils } = require('../../commons');
+import { check } from 'express-validator';
+import { utils } from '../../commons';
 
-module.exports = [
+export = [
     check('ip')
         .exists()
         .withMessage('IP is required')

@@ -1,13 +1,13 @@
 
-const express = require('express');
-const dotenv = require('dotenv');
+import express, { Express } from 'express';
+import dotenv from 'dotenv';
 
-const routes = require('./routes');
+import routes from './routes';
 
-const app = express();
+const app: Express = express();
 const expressSwagger = require('express-swagger-generator')(app);
 
-let options = {
+let options: any = {
     swaggerDefinition: {
         info: {
             description: 'This is a sample server',

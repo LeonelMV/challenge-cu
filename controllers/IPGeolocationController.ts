@@ -1,9 +1,10 @@
-const { validationResult } = require('express-validator');
+import { Request, Response } from 'express';
+import { validationResult } from 'express-validator';
 
-const { IPGeolocationService } = require('../services');
-const { logger } = require('../commons');
+import { IPGeolocationService } from '../services';
+import { logger } from '../commons';
 
-const ipTraces = async (req, res) => {
+const ipTraces = async (req: Request, res: Response) => {
     try{
         const resultValidationReq = validationResult(req);
         const hasErrors = !resultValidationReq.isEmpty();
@@ -25,7 +26,7 @@ const ipTraces = async (req, res) => {
  * @param {*} req 
  * @param {*} res 
  */
-const getStatistics = (req, res) => {
+const getStatistics = (req: Request, res: Response) => {
     try{
         const result = IPGeolocationService.getStatistics();
         res.status(200).send(result)
@@ -35,7 +36,7 @@ const getStatistics = (req, res) => {
     }
 }
 
-module.exports = {
+export default {
     ipTraces,
     getStatistics,
 }
