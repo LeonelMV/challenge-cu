@@ -72,7 +72,7 @@ const getStatistics = () => {
     return result;
 }
 
-const convertCurrency = async (fromCurrency: any, toCurrency = "USD", amount = 1) => {
+const convertCurrency = async (fromCurrency: string, toCurrency : string = "USD", amount: number = 1) => {
     let result;
     try{
         const headers = {
@@ -106,7 +106,7 @@ const ipTracesResponseMapping = async (ipData: any) => {
 }
 
 /* Mapping the final response */
-const currencyResponseMapping = (currencyData: any) => {
+const currencyResponseMapping = (currencyData: any) : Array<any> => {
     let currencies: Array<any> = [];
     if(currencyData){
         currencies = [

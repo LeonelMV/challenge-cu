@@ -1,4 +1,4 @@
-const getDistanceFromLatLonInKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+const getDistanceFromLatLonInKm = (lat1: number, lon1: number, lat2: number, lon2: number) : number => {
 	var R = 6371; // Radius of the earth in km
 	var dLat = deg2rad(lat2-lat1);  // deg2rad below
 	var dLon = deg2rad(lon2-lon1); 
@@ -11,11 +11,11 @@ const getDistanceFromLatLonInKm = (lat1: number, lon1: number, lat2: number, lon
 	return d;
 }
 
-const deg2rad = (deg: number) => {
+const deg2rad = (deg: number) : number => {
 	return deg * (Math.PI/180)
 }
 
-const validateIPaddress = (ip: string) => {  
+const validateIPaddress = (ip: string) : boolean => {  
     let isValidIP = false;
     if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ip)) {  
         isValidIP = true;
