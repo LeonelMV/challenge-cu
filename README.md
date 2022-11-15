@@ -17,6 +17,10 @@ Just run the following command:
 npm install
 ```
 
+```build
+npm run build
+```
+
 ## To start with npm in development mode
 
 ```javascript
