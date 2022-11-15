@@ -58,7 +58,6 @@ const getStatistics = async () => {
         longestDistranceFound: ''
     };
     const requestTraces = await redisClient.getAll();
-    console.log(requestTraces)
     if(requestTraces.length > 0){
         let mostTracedFound : any;
         let longestDistranceFound : any;
