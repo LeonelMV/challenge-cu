@@ -7,7 +7,7 @@ const cacheTraces = async (req: Request, res: Response, next: Function) => {
     try{
         const { ip } = req.body;
         if(appCache.has(ip)) {
-            logger.info("** El pais ya existia en cache de redis **");
+            logger.info("** Country already exist on redis cache **");
             const cachedData = await appCache.get(ip);
             logger.info(JSON.stringify(cachedData))
             IPGeolocationService.saveHistoryTraces(cachedData);
@@ -16,7 +16,7 @@ const cacheTraces = async (req: Request, res: Response, next: Function) => {
             next();
         }
     }catch(error){
-        logger.error("Error en middleware de cache.");
+        logger.error("Error in middleware cache.");
         logger.error(error);
     }
 }
