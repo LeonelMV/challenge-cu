@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const commons_1 = require("../commons");
-const cache_1 = require("../cache");
+const index_1 = require("./index");
 /**
  * Getting trace by ip
  * @param {ip} req
@@ -28,42 +28,52 @@ const ipTraces = (ip) => __awaiter(void 0, void 0, void 0, function* () {
             status: response === null || response === void 0 ? void 0 : response.status,
             data: yield ipTracesResponseMapping(response === null || response === void 0 ? void 0 : response.data),
         };
-        saveHistoryTraces(response === null || response === void 0 ? void 0 : response.data);
+        yield saveHistoryTraces(result === null || result === void 0 ? void 0 : result.data);
     }
     catch (error) {
         throw (error);
     }
     return result;
 });
-const saveHistoryTraces = (newTraceData) => {
-    const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
-    let traceToSave = cache_1.requestTraces.find((trace) => trace.country === newTraceData.country);
-    if (!traceToSave) {
-        cache_1.requestTraces.push({
-            country: newTraceData.country,
+const saveHistoryTraces = (newTraceData) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
+        // Init default trace values
+        let traceToSave = {
+            country: newTraceData.name,
             tracesCount: 1,
             distanceFromUSA: commons_1.utils.getDistanceFromLatLonInKm(newTraceData.lat, newTraceData.lon, newYorkLatLon.lat, newYorkLatLon.lon)
-        });
-    }
-    else {
-        traceToSave = {
-            country: traceToSave.country,
-            tracesCount: traceToSave.tracesCount++,
         };
+        //Check if exist in cache and if exist, replace the current value
+        const traceCache = yield index_1.redisClient.get(newTraceData.name);
+        if (traceCache) {
+            traceToSave = {
+                country: traceCache.country,
+                tracesCount: traceCache.tracesCount + 1,
+                distanceFromUSA: traceCache.distanceFromUSA
+            };
+        }
+        //Setting or Updating in cache
+        index_1.redisClient.set(traceToSave.country, traceToSave);
     }
-};
+    catch (error) {
+        commons_1.logger.error(error);
+    }
+});
 /**
  * Getting statistics
  */
-const getStatistics = () => {
+const getStatistics = () => __awaiter(void 0, void 0, void 0, function* () {
     let result = {
         mostTracedFound: '',
         longestDistranceFound: ''
     };
-    if (cache_1.requestTraces.length > 0) {
+    const requestTraces = yield index_1.redisClient.getAll();
+    console.log(requestTraces);
+    if (requestTraces.length > 0) {
         let mostTracedFound;
         let longestDistranceFound;
-        cache_1.requestTraces.forEach((requestTrace) => {
+        requestTraces.forEach((requestTrace) => {
             if (!mostTracedFound || (mostTracedFound.tracesCount < requestTrace.tracesCount)) {
                 mostTracedFound = requestTrace;
             }
@@ -83,7 +93,7 @@ const getStatistics = () => {
         };
     }
     return result;
-};
+});
 const convertCurrency = (fromCurrency, toCurrency = "USD", amount = 1) => __awaiter(void 0, void 0, void 0, function* () {
     let result;
     try {
@@ -101,18 +111,23 @@ const convertCurrency = (fromCurrency, toCurrency = "USD", amount = 1) => __awai
 /* Mapping the final response */
 const ipTracesResponseMapping = (ipData) => __awaiter(void 0, void 0, void 0, function* () {
     let response = {};
-    if (ipData) {
-        const { country: name, countryCode: code, lat, lon, query: ip, currency } = ipData;
-        const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
-        response = {
-            ip,
-            name,
-            code,
-            lat,
-            lon,
-            currencies: yield convertCurrency(currency),
-            distance_to_usa: parseFloat(commons_1.utils.getDistanceFromLatLonInKm(lat, lon, newYorkLatLon.lat, newYorkLatLon.lon).toFixed(2)),
-        };
+    try {
+        if (ipData) {
+            const { country: name, countryCode: code, lat, lon, query: ip, currency } = ipData;
+            const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
+            response = {
+                ip,
+                name,
+                code,
+                lat,
+                lon,
+                currencies: yield convertCurrency(currency),
+                distance_to_usa: parseFloat(commons_1.utils.getDistanceFromLatLonInKm(lat, lon, newYorkLatLon.lat, newYorkLatLon.lon).toFixed(2)),
+            };
+        }
+    }
+    catch (error) {
+        commons_1.logger.error(error);
     }
     return response;
 });
@@ -139,4 +154,5 @@ const currencyResponseMapping = (currencyData) => {
 exports.default = {
     ipTraces,
     getStatistics,
+    saveHistoryTraces,
 };

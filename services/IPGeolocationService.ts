@@ -1,6 +1,6 @@
 import axios from "axios";
-import { utils } from '../commons';
-import { requestTraces } from '../cache';
+import { logger, utils } from '../commons';
+import { redisClient } from './index'
 
 /**
  * Getting trace by ip
@@ -15,37 +15,50 @@ const ipTraces = async (ip: string) => {
             status: response?.status,
             data: await ipTracesResponseMapping(response?.data),
          };
-         saveHistoryTraces(response?.data);
+         await saveHistoryTraces(result?.data);
     }catch(error){
         throw(error);
     }
     return result;
 }
 
-const saveHistoryTraces = (newTraceData: any) => {
-    const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
-    let traceToSave = requestTraces.find((trace: any) => trace.country === newTraceData.country);
-    if(!traceToSave){
-        requestTraces.push({  
-            country: newTraceData.country, 
+const saveHistoryTraces = async (newTraceData: any) => {
+    try{
+        const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
+        // Init default trace values
+        let traceToSave = {  
+            country: newTraceData.name, 
             tracesCount: 1, 
-            distanceFromUSA: utils.getDistanceFromLatLonInKm(newTraceData.lat, newTraceData.lon, newYorkLatLon.lat, newYorkLatLon.lon) });
-    }else{
-        traceToSave = {
-            country: traceToSave.country,
-            tracesCount: traceToSave.tracesCount++,
+            distanceFromUSA: utils.getDistanceFromLatLonInKm(newTraceData.lat, newTraceData.lon, newYorkLatLon.lat, newYorkLatLon.lon)
+        };
+
+        //Check if exist in cache and if exist, replace the current value
+        const traceCache = await redisClient.get(newTraceData.name);
+        if(traceCache){
+            traceToSave = {
+                country: traceCache.country,
+                tracesCount: traceCache.tracesCount + 1,
+                distanceFromUSA: traceCache.distanceFromUSA
+            }
         }
+
+        //Setting or Updating in cache
+        redisClient.set(traceToSave.country, traceToSave);
+    }catch(error){
+        logger.error(error);
     }
 }
 
 /**
  * Getting statistics
  */
-const getStatistics = () => {   
+const getStatistics = async () => {   
     let result: any = {
         mostTracedFound: '',
         longestDistranceFound: ''
     };
+    const requestTraces = await redisClient.getAll();
+    console.log(requestTraces)
     if(requestTraces.length > 0){
         let mostTracedFound : any;
         let longestDistranceFound : any;
@@ -89,19 +102,24 @@ const convertCurrency = async (fromCurrency: string, toCurrency : string = "USD"
 /* Mapping the final response */
 const ipTracesResponseMapping = async (ipData: any) => {
     let response = {};
-    if(ipData){
-        const { country: name, countryCode: code, lat, lon, query: ip, currency } = ipData;
-        const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
-        response = {
-            ip,
-            name, 
-            code, 
-            lat, 
-            lon,
-            currencies: await convertCurrency(currency),
-            distance_to_usa: parseFloat(utils.getDistanceFromLatLonInKm(lat, lon, newYorkLatLon.lat, newYorkLatLon.lon).toFixed(2)),
+    try{
+        if(ipData){
+            const { country: name, countryCode: code, lat, lon, query: ip, currency } = ipData;
+            const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
+            response = {
+                ip,
+                name, 
+                code, 
+                lat, 
+                lon,
+                currencies: await convertCurrency(currency),
+                distance_to_usa: parseFloat(utils.getDistanceFromLatLonInKm(lat, lon, newYorkLatLon.lat, newYorkLatLon.lon).toFixed(2)),
+            }
         }
+    }catch(error){
+        logger.error(error);
     }
+    
     return response;
 }
 
@@ -128,4 +146,5 @@ const currencyResponseMapping = (currencyData: any) : Array<any> => {
 export default {
     ipTraces,
     getStatistics,
+    saveHistoryTraces,
 }

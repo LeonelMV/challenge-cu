@@ -28,9 +28,9 @@ const ipTraces = async (req: Request, res: Response) => {
  * @param {*} req 
  * @param {*} res 
  */
-const getStatistics = (req: Request, res: Response) => {
+const getStatistics = async (req: Request, res: Response) => {
     try{
-        const result = IPGeolocationService.getStatistics();
+        const result = await IPGeolocationService.getStatistics();
         res.status(200).send(result)
     }catch(error) {
         logger.error(error);
