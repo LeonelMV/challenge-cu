@@ -10,7 +10,7 @@ const expressSwagger = require('express-swagger-generator')(app);
 let options: any = {
     swaggerDefinition: {
         info: {
-            description: 'This is a sample server',
+            description: 'Challenge',
             title: 'Swagger',
             version: '1.0.0',
         },
@@ -33,7 +33,6 @@ app.use(express.json());
 dotenv.config();
 
 app.use('/api', routes);
-
 
 app.listen(process.env['PORT'], () => {
     console.log(`Server running on port ${process.env['PORT']}`);

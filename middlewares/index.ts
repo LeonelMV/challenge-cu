@@ -9,7 +9,7 @@ const cacheTraces = async (req: Request, res: Response, next: Function) => {
         if(appCache.has(ip)) {
             logger.info("** Country already exist on redis cache **");
             const cachedData = await appCache.get(ip);
-            logger.info(JSON.stringify(cachedData))
+            logger.info(JSON.stringify(cachedData));
             IPGeolocationService.saveHistoryTraces(cachedData);
             return res.status(200).send(cachedData);
         }else{
