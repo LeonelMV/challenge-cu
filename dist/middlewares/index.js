@@ -17,18 +17,18 @@ const cacheTraces = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     try {
         const { ip } = req.body;
         if (cache_1.appCache.has(ip)) {
-            commons_1.logger.info("** El pais ya existia en cache de redis **");
+            commons_1.logger.info("** Country already exist on redis cache **");
             const cachedData = yield cache_1.appCache.get(ip);
             commons_1.logger.info(JSON.stringify(cachedData));
             services_1.IPGeolocationService.saveHistoryTraces(cachedData);
             return res.status(200).send(cachedData);
         }
         else {
-            next();
+            return next();
         }
     }
     catch (error) {
-        commons_1.logger.error("Error en middleware de cache.");
+        commons_1.logger.error("Error in middleware cache.");
         commons_1.logger.error(error);
     }
 });

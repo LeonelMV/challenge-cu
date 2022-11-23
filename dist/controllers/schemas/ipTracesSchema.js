@@ -7,6 +7,6 @@ module.exports = [
         .withMessage('IP is required')
         .notEmpty()
         .withMessage('IP cannot be empty')
-        .custom((value, { req }) => commons_1.utils.validateIPaddress(value))
+        .custom((value, {}) => commons_1.utils.validateIPaddress(value))
         .withMessage('Invalid IP'),
 ];

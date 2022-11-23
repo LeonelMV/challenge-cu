@@ -23,12 +23,9 @@ const index_1 = require("./index");
 const ipTraces = (ip) => __awaiter(void 0, void 0, void 0, function* () {
     let result;
     try {
-        const response = yield axios_1.default.post(`${process.env.IP_API_BASE_URL}/json/${ip}?fields=country,countryCode,lat,lon,currency,query`);
-        result = {
-            status: response === null || response === void 0 ? void 0 : response.status,
-            data: yield ipTracesResponseMapping(response === null || response === void 0 ? void 0 : response.data),
-        };
-        yield saveHistoryTraces(result === null || result === void 0 ? void 0 : result.data);
+        const { data } = yield axios_1.default.post(`${process.env['IP_API_BASE_URL']}/json/${ip}?fields=country,countryCode,lat,lon,currency,query`);
+        result = yield ipTracesResponseMapping(data);
+        yield saveHistoryTraces(result);
     }
     catch (error) {
         throw (error);
@@ -69,7 +66,6 @@ const getStatistics = () => __awaiter(void 0, void 0, void 0, function* () {
         longestDistranceFound: ''
     };
     const requestTraces = yield index_1.redisClient.getAll();
-    console.log(requestTraces);
     if (requestTraces.length > 0) {
         let mostTracedFound;
         let longestDistranceFound;
@@ -98,9 +94,9 @@ const convertCurrency = (fromCurrency, toCurrency = "USD", amount = 1) => __awai
     let result;
     try {
         const headers = {
-            "apikey": process.env.API_LAYER_KEY
+            "apikey": process.env['API_LAYER_KEY']
         };
-        const response = yield axios_1.default.get(`${process.env.API_LAYER_BASE_URL}/fixer/convert?to=${toCurrency}&from=${fromCurrency}&amount=${amount}`, { headers });
+        const response = yield axios_1.default.get(`${process.env['API_LAYER_BASE_URL']}/fixer/convert?to=${toCurrency}&from=${fromCurrency}&amount=${amount}`, { headers });
         result = currencyResponseMapping(response === null || response === void 0 ? void 0 : response.data);
     }
     catch (error) {
@@ -110,9 +106,9 @@ const convertCurrency = (fromCurrency, toCurrency = "USD", amount = 1) => __awai
 });
 /* Mapping the final response */
 const ipTracesResponseMapping = (ipData) => __awaiter(void 0, void 0, void 0, function* () {
-    let response = {};
     try {
         if (ipData) {
+            let response;
             const { country: name, countryCode: code, lat, lon, query: ip, currency } = ipData;
             const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
             response = {
@@ -124,12 +120,13 @@ const ipTracesResponseMapping = (ipData) => __awaiter(void 0, void 0, void 0, fu
                 currencies: yield convertCurrency(currency),
                 distance_to_usa: parseFloat(commons_1.utils.getDistanceFromLatLonInKm(lat, lon, newYorkLatLon.lat, newYorkLatLon.lon).toFixed(2)),
             };
+            return response;
         }
     }
     catch (error) {
         commons_1.logger.error(error);
     }
-    return response;
+    return;
 });
 /* Mapping the final response */
 const currencyResponseMapping = (currencyData) => {

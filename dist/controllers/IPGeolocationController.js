@@ -22,27 +22,27 @@ const ipTraces = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         const { ip } = req.body;
         const result = yield services_1.IPGeolocationService.ipTraces(ip);
-        cache_1.appCache.set(ip, result === null || result === void 0 ? void 0 : result.data);
-        res.status(result === null || result === void 0 ? void 0 : result.status).send(result === null || result === void 0 ? void 0 : result.data);
+        cache_1.appCache.set(ip, result);
+        return res.status(200).send(result);
     }
     catch (error) {
         commons_1.logger.error(error);
-        res.status(500).send(error);
+        return res.status(500).send(error);
     }
 });
 /**
  *
- * @param {*} req
+ * @param {*} _req
  * @param {*} res
  */
-const getStatistics = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getStatistics = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield services_1.IPGeolocationService.getStatistics();
-        res.status(200).send(result);
+        return res.status(200).send(result);
     }
     catch (error) {
         commons_1.logger.error(error);
-        res.status(500).send(error);
+        return res.status(500).send(error);
     }
 });
 exports.default = {

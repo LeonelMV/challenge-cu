@@ -7,6 +7,6 @@ export = [
         .withMessage('IP is required')
         .notEmpty()
         .withMessage('IP cannot be empty')
-        .custom((value, { req }) => utils.validateIPaddress(value))
+        .custom((value: any, { }) => utils.validateIPaddress(value))
         .withMessage('Invalid IP'),
 ];

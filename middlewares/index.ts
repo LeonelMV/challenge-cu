@@ -13,7 +13,7 @@ const cacheTraces = async (req: Request, res: Response, next: Function) => {
             IPGeolocationService.saveHistoryTraces(cachedData);
             return res.status(200).send(cachedData);
         }else{
-            next();
+           return next();
         }
     }catch(error){
         logger.error("Error in middleware cache.");

@@ -1,40 +1,41 @@
 import { Request, Response } from 'express';
-import { validationResult } from 'express-validator';
+import { Result, ValidationError, validationResult } from 'express-validator';
 import { appCache } from "../cache";
 
 import { IPGeolocationService } from '../services';
 import { logger } from '../commons';
+import { IPTraceResponse } from '../dto/IPTraceResponse';
 
 const ipTraces = async (req: Request, res: Response) => {
     try{
-        const resultValidationReq = validationResult(req);
-        const hasErrors = !resultValidationReq.isEmpty();
+        const resultValidationReq: Result<ValidationError> = validationResult(req);
+        const hasErrors: boolean = !resultValidationReq.isEmpty();
 
         if(hasErrors){
             return res.status(400).send(resultValidationReq); 
         }
         const { ip } = req.body;
-        const result = await IPGeolocationService.ipTraces(ip);
-        appCache.set(ip, result?.data);
-        res.status(result?.status).send(result?.data)
+        const result: (IPTraceResponse | undefined) = await IPGeolocationService.ipTraces(ip);
+        appCache.set(ip, result);
+        return res.status(200).send(result)
     }catch(error) {
         logger.error(error);
-        res.status(500).send(error);
+        return res.status(500).send(error);
     }
 }
 
 /**
  * 
- * @param {*} req 
+ * @param {*} _req 
  * @param {*} res 
  */
-const getStatistics = async (req: Request, res: Response) => {
+const getStatistics = async (_req: Request, res: Response) => {
     try{
         const result = await IPGeolocationService.getStatistics();
-        res.status(200).send(result)
+        return res.status(200).send(result)
     }catch(error) {
         logger.error(error);
-        res.status(500).send(error);
+        return res.status(500).send(error);
     }
 }
 

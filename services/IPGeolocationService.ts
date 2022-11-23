@@ -1,21 +1,20 @@
 import axios from "axios";
 import { logger, utils } from '../commons';
+import { IPTraceDTO } from '../dto/IPTraceDTO';
 import { redisClient } from './index'
+import { IPTraceResponse } from '../dto/IPTraceResponse';
 
 /**
  * Getting trace by ip
  * @param {ip} req 
  * @param {*} res 
  */
-const ipTraces = async (ip: string) => {
-    let result;
+const ipTraces = async (ip: string): Promise<IPTraceResponse | undefined> => {
+    let result: IPTraceResponse | undefined;
     try{
-        const response = await axios.post(`${process.env.IP_API_BASE_URL}/json/${ip}?fields=country,countryCode,lat,lon,currency,query`);
-        result = {
-            status: response?.status,
-            data: await ipTracesResponseMapping(response?.data),
-         };
-         await saveHistoryTraces(result?.data);
+        const { data } = await axios.post<IPTraceDTO>(`${process.env['IP_API_BASE_URL']}/json/${ip}?fields=country,countryCode,lat,lon,currency,query`);
+        result = await ipTracesResponseMapping(data);
+        await saveHistoryTraces(result);
     }catch(error){
         throw(error);
     }
@@ -88,9 +87,9 @@ const convertCurrency = async (fromCurrency: string, toCurrency : string = "USD"
     let result;
     try{
         const headers = {
-            "apikey": process.env.API_LAYER_KEY
+            "apikey": process.env['API_LAYER_KEY']
         }
-        const response = await axios.get(`${process.env.API_LAYER_BASE_URL}/fixer/convert?to=${toCurrency}&from=${fromCurrency}&amount=${amount}`, { headers });
+        const response = await axios.get(`${process.env['API_LAYER_BASE_URL']}/fixer/convert?to=${toCurrency}&from=${fromCurrency}&amount=${amount}`, { headers });
         result = currencyResponseMapping(response?.data);
     }catch(error){
         throw(error);
@@ -99,10 +98,10 @@ const convertCurrency = async (fromCurrency: string, toCurrency : string = "USD"
 }
 
 /* Mapping the final response */
-const ipTracesResponseMapping = async (ipData: any) => {
-    let response = {};
+const ipTracesResponseMapping = async (ipData: IPTraceDTO): (Promise<IPTraceResponse | undefined>) => {
     try{
         if(ipData){
+            let response: IPTraceResponse;
             const { country: name, countryCode: code, lat, lon, query: ip, currency } = ipData;
             const newYorkLatLon = { "lat": 40.7127837, "lon": -74.0059413 };
             response = {
@@ -114,12 +113,12 @@ const ipTracesResponseMapping = async (ipData: any) => {
                 currencies: await convertCurrency(currency),
                 distance_to_usa: parseFloat(utils.getDistanceFromLatLonInKm(lat, lon, newYorkLatLon.lat, newYorkLatLon.lon).toFixed(2)),
             }
+            return response;
         }
     }catch(error){
         logger.error(error);
     }
-    
-    return response;
+    return;
 }
 
 /* Mapping the final response */

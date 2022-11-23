@@ -35,6 +35,6 @@ dotenv.config();
 app.use('/api', routes);
 
 
-app.listen(process.env.PORT, () => {
-    console.log(`Server running on port ${process.env.port}`);
+app.listen(process.env['PORT'], () => {
+    console.log(`Server running on port ${process.env['PORT']}`);
 });

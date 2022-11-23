@@ -1,7 +1,7 @@
 'use strict'
 
-import express from 'express';
-const api = express.Router();
+import express, { Router } from 'express';
+const api: Router = express.Router();
 
 import { IPGeolocationController } from "../controllers";
 
